@@ -1,0 +1,11 @@
+changelog:
+  categories:
+    - title: Improvements
+      labels:
+        - Improvement
+    - title: Bugs
+      labels:
+        - Bug
+    - title: Dependencies
+      labels:
+        - dependencies

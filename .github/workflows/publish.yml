@@ -1,0 +1,36 @@
+name: Publish
+on:
+  release:
+    types: [published]
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4.0.1
+        with:
+          dotnet-version: 8.0.x
+          source-url: ${{ vars.PARTICULAR_FEED_URL}}
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
+      - name: Build
+        run: dotnet build TotallyLegit --configuration Release
+      #        - name: Sign NuGet packages
+      #          uses: Particular/sign-nuget-packages-action@v1.0.0
+      #          with:
+      #            client-id: ${{ secrets.AZURE_KEY_VAULT_CLIENT_ID }}
+      #            tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
+      #            client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
+      #            certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: nugets
+          path: nugets/*
+          retention-days: 1
+#        - name: Push packages to nuget
+#          run: dotnet nuget push nugets\*.nupkg
