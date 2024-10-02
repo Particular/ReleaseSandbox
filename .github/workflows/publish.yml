@@ -14,9 +14,9 @@ jobs:
         uses: actions/setup-dotnet@v4.0.1
         with:
           dotnet-version: 8.0.x
-          source-url: ${{ vars.PARTICULAR_FEED_URL}}
+          source-url: ${{ vars.FEED_URL}}
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
+          NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
       - name: Build
         run: dotnet build TotallyLegit --configuration Release
       #        - name: Sign NuGet packages
