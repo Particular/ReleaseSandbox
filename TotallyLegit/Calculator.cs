@@ -18,4 +18,9 @@ public class Calculator
     {
         return _result -= nextNumber;
     }
+
+    public int Multiply(int nextNumber)
+    {
+        return _result *= nextNumber;
+    }
 }
