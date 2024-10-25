@@ -19,7 +19,7 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
       - name: Build
-        run: dotnet build TotallyLegit --configuration Release
+        run: dotnet build src --configuration Release
       #        - name: Sign NuGet packages
       #          uses: Particular/sign-nuget-packages-action@v1.0.0
       #          with:
