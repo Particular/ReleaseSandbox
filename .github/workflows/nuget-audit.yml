@@ -36,6 +36,11 @@ jobs:
         run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
       - name: Report results
         run: |
-          dotnet list package --vulnerable --include-transitive --format json >> "${{ github.workspace }}/vulnerabilities.json"
-          jq -s '.' */obj/project.assets.json > "${{ github.workspace }}/all.project.assets.json"
-          #curl -F "vulnerabilities=${{ github.workspace }}/vulnerabilities.json" -F "assets=${{ github.workspace }}/all.project.assets.json" -H "x-functions-key: ${{ secrets.NUGET_AUDIT_TOKEN }}" ${{ secrets.INTERNAL_AUTOMATION_URI }}
+          dotnet list package --vulnerable --include-transitive --format json >> "${{ github.workspace }}/results/vulnerabilities.json"
+          jq -s '.' */obj/project.assets.json > "${{ github.workspace }}/results/all.project.assets.json"
+          #curl -F "vulnerabilities=${{ github.workspace }}/results/vulnerabilities.json" -F "assets=${{ github.workspace }}/results/all.project.assets.json" -H "x-functions-key: ${{ secrets.NUGET_AUDIT_TOKEN }}" ${{ secrets.INTERNAL_AUTOMATION_URI }}
+      - name: Archive vulnerability report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: ${{ github.workspace }}/results/*.json
