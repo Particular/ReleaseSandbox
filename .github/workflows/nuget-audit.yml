@@ -21,7 +21,7 @@ jobs:
         run: dotnet restore
   report:
     needs: audit
-    if: needs.audit.result == 'failure'
+    if: ${{ failure }}
     runs-on: ubuntu-22.04
     defaults:
         run:
