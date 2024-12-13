@@ -18,9 +18,7 @@ jobs:
           global-json-file: global.json
       - name: Restore
         id: restore
-        run:  |
-          echo CVECOUNT=$(dotnet restore src -v m | grep -c -e "NU190[1-4]") >> $GITHUB_OUTPUT
-          exit $CVECOUNT
+        run: dotnet restore
   report:
     needs: audit
     if: needs.audit.result == 'failure'
