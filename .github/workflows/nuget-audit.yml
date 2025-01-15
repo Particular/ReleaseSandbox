@@ -4,31 +4,6 @@ on:
 env:
   DOTNET_NOLOGO: true
 jobs:
-  audit:
-    runs-on: ubuntu-22.04
-    defaults:
-        run:
-          working-directory: ./src  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.2.2
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4.1.0
-        with:
-          global-json-file: global.json
-      - name: Restore
-        id: restore
-        run: dotnet restore
-      - name: Report results
-        if: ${{ failure() }}
-        run: |
-          mkdir ${{ github.workspace }}/results
-          dotnet list package --vulnerable --include-transitive --format json >> "${{ github.workspace }}/results/vulnerabilities.json"
-          jq -s '.' */obj/project.assets.json > "${{ github.workspace }}/results/all.project.assets.json"
-          #curl -F "vulnerabilities=${{ github.workspace }}/results/vulnerabilities.json" -F "assets=${{ github.workspace }}/results/all.project.assets.json" -H "x-functions-key: ${{ secrets.NUGET_AUDIT_TOKEN }}" ${{ secrets.INTERNAL_AUTOMATION_URI }}
-      - name: Archive vulnerability report
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: report
-          path: ${{ github.workspace }}/results/*.json
+  call-nuget-audit:
+    uses: particular/shared-workflows/.github/workflows/nuget-audit.yml@main
+    secrets: inherit
