@@ -10,6 +10,7 @@ jobs:
   report-results:
     runs-on: ubuntu-22.04
     needs: call-nuget-audit
+    if: always()
     steps:
       - run: |
           echo "### dotnet restore result" >> $GITHUB_STEP_SUMMARY
