@@ -16,5 +16,5 @@ jobs:
           echo "### dotnet restore result" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "```bash" >> $GITHUB_STEP_SUMMARY
-          echo ${{ needs.call-nuget-audit.outputs.dotnetrestore }} >> $GITHUB_STEP_SUMMARY
+          echo ${{ needs.call-nuget-audit.outputs.restorereport }} >> $GITHUB_STEP_SUMMARY
           echo "```" >> $GITHUB_STEP_SUMMARY
