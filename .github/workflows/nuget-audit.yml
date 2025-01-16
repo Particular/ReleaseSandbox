@@ -7,3 +7,13 @@ jobs:
   call-nuget-audit:
     uses: particular/shared-workflows/.github/workflows/audit-nuget.yml@main
     secrets: inherit
+  report-results:
+    runs-on: ubuntu-22.04
+    needs: call-nuget-audit
+    steps:
+      - run: |
+          echo "### dotnet restore result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "```bash" >> $GITHUB_STEP_SUMMARY
+          echo ${{ needs.call-nuget-audit.outputs.dotnetrestore }} >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
