@@ -7,12 +7,12 @@ jobs:
   call-shared-nuget-audit:
     uses: particular/shared-workflows/.github/workflows/audit-nuget.yml@main
     secrets: inherit
-  add-dotnet-restore-output-to-summary:
-    runs-on: ubuntu-22.04
-    needs: call-shared-nuget-audit
-    if: always()
-    steps:
-      - run: |
-          echo "### `dotnet restore` result" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "${${{ needs.call-shared-nuget-audit.outputs.restoreoutput }}//'%0A'/\n}" >> $GITHUB_STEP_SUMMARY
+  #add-dotnet-restore-output-to-summary:
+  #  runs-on: ubuntu-22.04
+  #  needs: call-shared-nuget-audit
+  #  if: always()
+  #  steps:
+  #    - run: |
+  #        echo "### `dotnet restore` result" >> $GITHUB_STEP_SUMMARY
+  #        echo "" >> $GITHUB_STEP_SUMMARY
+  #        echo "${${{ needs.call-shared-nuget-audit.outputs.restoreoutput }}//'%0A'/\n}" >> $GITHUB_STEP_SUMMARY
