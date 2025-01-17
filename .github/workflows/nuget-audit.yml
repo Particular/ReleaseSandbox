@@ -13,8 +13,10 @@ jobs:
     if: always()
     steps:
       - run: |
-          echo "### dotnet restore result" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "```bash" >> $GITHUB_STEP_SUMMARY
-          cat ${{ runner.temp }}/dotnetrestore.log >> $GITHUB_STEP_SUMMARY
-          echo "```" >> $GITHUB_STEP_SUMMARY
+          {
+            echo '### dotnet restore result<<EOF'
+            echo "```bash"
+            cat ${{ github.workspace }}/results/dotnetrestore.log
+            echo "```"
+            echo EOF
+          } >> $GITHUB_STEP_SUMMARY
