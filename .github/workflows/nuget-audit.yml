@@ -15,4 +15,4 @@ jobs:
       - run: |
           echo "### `dotnet restore` result" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo ${{ needs.call-shared-nuget-audit.outputs.restoreoutput }} >> $GITHUB_STEP_SUMMARY
+          echo "${${{ needs.call-shared-nuget-audit.outputs.restoreoutput }}//'%0A'/\n}" >> $GITHUB_STEP_SUMMARY
