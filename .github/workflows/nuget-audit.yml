@@ -4,19 +4,15 @@ on:
 env:
   DOTNET_NOLOGO: true
 jobs:
-  call-nuget-audit:
+  call-shared-nuget-audit:
     uses: particular/shared-workflows/.github/workflows/audit-nuget.yml@main
     secrets: inherit
-  report-results:
+  add-dotnet-restore-output-to-summary:
     runs-on: ubuntu-22.04
-    needs: call-nuget-audit
+    needs: call-shared-nuget-audit
     if: always()
     steps:
       - run: |
-          {
-            echo "### `dotnet restore` result"
-            echo ""
-            while read p; do
-              echo "$p"
-            done <${{ github.workspace }}/results/dotnetrestore.log
-          } > $GITHUB_STEP_SUMMARY
+          echo "### `dotnet restore` result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo ${{ needs.call-shared-nuget-audit.outputs.restoreoutput }} >> $GITHUB_STEP_SUMMARY
