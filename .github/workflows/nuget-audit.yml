@@ -14,9 +14,9 @@ jobs:
     steps:
       - run: |
           {
-            echo '### dotnet restore result<<EOF'
-            echo "```bash"
-            cat ${{ github.workspace }}/results/dotnetrestore.log
-            echo "```"
-            echo EOF
-          } >> $GITHUB_STEP_SUMMARY
+            echo "### `dotnet restore` result"
+            echo ""
+            while read p; do
+              echo "$p"
+            done <${{ github.workspace }}/results/dotnetrestore.log
+          } > $GITHUB_STEP_SUMMARY
