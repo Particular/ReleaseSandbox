@@ -4,8 +4,6 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NuGetAuditMode>all</NuGetAuditMode>
         <Description>A TotallyLegit package for testing.</Description>
     </PropertyGroup>
 
