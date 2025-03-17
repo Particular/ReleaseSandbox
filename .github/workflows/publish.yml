@@ -14,8 +14,8 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4.1.0
         with:
-          dotnet-version: 8.0.x
-          source-url: ${{ vars.FEED_URL}}
+          dotnet-version: 9.0.x
+          # source-url: ${{ vars.FEED_URL}}
         env:
           NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
       - name: Build
@@ -33,5 +33,5 @@ jobs:
           name: nugets
           path: nugets/*
           retention-days: 1
-      - name: Push packages to nuget
-        run: dotnet nuget push nugets\*.nupkg
+     # - name: Push packages to nuget
+     #   run: dotnet nuget push nugets\*.nupkg
