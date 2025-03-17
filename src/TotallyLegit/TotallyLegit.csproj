@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NuGetAuditMode>all</NuGetAuditMode>
+        <Description>A TotallyLegit package for testing.</Description>
     </PropertyGroup>
 
     <ItemGroup Label="Public dependencies">
