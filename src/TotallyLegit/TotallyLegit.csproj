@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup Label="Public dependencies">
-        <PackageReference Include="NServiceBus" Version="7.8.5" />
+        <PackageReference Include="NServiceBus" Version="7.8.6" />
         <PackageReference Include="System.Text.Json" Version="8.0.1" />
     </ItemGroup>
 
