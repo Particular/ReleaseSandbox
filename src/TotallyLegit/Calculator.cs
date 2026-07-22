@@ -1,7 +1,7 @@
 ﻿namespace TotallyLegit;
 
 /// <summary>
-/// A simple running-total calculator.
+/// A simple running-total calculator
 /// </summary>
 public class Calculator
 {
