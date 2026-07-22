@@ -6,3 +6,4 @@ changelog:
     - title: Bugs
       labels:
         - Bug
+        - bug
