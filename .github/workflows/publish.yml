@@ -30,11 +30,13 @@ jobs:
       #            tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
       #            client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
       #            certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
-      - name: Publish artifacts
+      - name: Publish artifacts to the workflow
         uses: actions/upload-artifact@v7.0.1
         with:
           name: nugets
           path: nugets/*
           retention-days: 1
+      - name: Publish artifacts to the release
+        run: gh release upload ${{github.event.release.tag_name}} nugets/*
      # - name: Push packages to nuget
      #   run: dotnet nuget push nugets\*.nupkg
