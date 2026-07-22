@@ -6,6 +6,3 @@ changelog:
     - title: Bugs
       labels:
         - Bug
-    - title: Dependencies
-      labels:
-        - dependencies
