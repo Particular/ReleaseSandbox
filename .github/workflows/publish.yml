@@ -38,5 +38,7 @@ jobs:
           retention-days: 1
       - name: Publish artifacts to the release
         run: gh release upload ${{github.event.release.tag_name}} nugets/*
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
      # - name: Push packages to nuget
      #   run: dotnet nuget push nugets\*.nupkg
