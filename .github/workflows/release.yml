@@ -1,0 +1,63 @@
+name: Publish
+on:
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    environment: staging
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+          # source-url: ${{ vars.FEED_URL}}
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
+      - name: Setup GitReleaseManager 
+        # https://github.com/GitTools/GitReleaseManager#net-global-tool
+        run: |
+          dotnet tool install --global GitReleaseManager.Tool
+          echo "templates-dir: .templates
+create:
+  include-footer: true
+  footer-heading: Where to get it
+  footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
+issue-labels-include:
+  - \"Bug\"
+  - \"Feature\"
+  - \"Improvement\"
+  - \"Dependency CVE\"
+issue-labels-exclude:
+  - \"Refactoring\"" > GitReleaseManager.yaml
+          echo GitReleaseManager.yaml contents
+          cat GitReleaseManager.yaml
+      - name: Build
+        run: dotnet build src --configuration Release
+      #        - name: Sign NuGet packages
+      #          uses: Particular/sign-nuget-packages-action@v1.0.0
+      #          with:
+      #            client-id: ${{ secrets.AZURE_KEY_VAULT_CLIENT_ID }}
+      #            tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
+      #            client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
+      #            certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
+      # - name: Publish artifacts to the workflow
+      #   uses: actions/upload-artifact@v7.0.1
+      #   with:
+      #     name: nugets
+      #     path: nugets/*
+      #     retention-days: 1
+      # - name: Create release notes draft
+      #   run: 
+      # - name: Publish artifacts to the release
+      #   run: gh release upload ${{github.event.release.tag_name}} nugets/*
+      #   env:
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+     # - name: Push packages to nuget
+     #   run: dotnet nuget push nugets\*.nupkg
