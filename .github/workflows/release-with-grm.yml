@@ -51,8 +51,10 @@ jobs:
           issue-labels-exclude:
             - "Refactoring"
           '@ > GitReleaseManager.yaml
-          Write-Output "GitReleaseManager.yaml contents"
+          Write-Output "`nGitReleaseManager.yaml contents:"
           Get-Content GitReleaseManager.yaml
+          Write-Output "`n`nGitReleaseManager issue_note.sbn template:"
+          Get-Content .templates/default/issue_note.sbn
       - name: Build
         run: dotnet build src --configuration Release
       #        - name: Sign NuGet packages
@@ -62,19 +64,21 @@ jobs:
       #            tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
       #            client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
       #            certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
-      # - name: Publish artifacts to the workflow
-      #   uses: actions/upload-artifact@v7.0.1
-      #   with:
-      #     name: nugets
-      #     path: nugets/*
-      #     retention-days: 1
+      - name: Publish artifacts to the workflow
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: nugets
+          path: nugets/*
+          retention-days: 1
       - name: Create release notes draft
         run: dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ github.ref_name }}" -c "${{ github.sha }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Publish artifacts to the release
-      #   run: gh release upload ${{github.event.release.tag_name}} nugets/*
-      #   env:
-      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Publish artifacts to the release
+        run: |
+          $assets = (Get-Children -Path nugets/ -File).FullName -join ","
+          dotnet-gitreleasemanager addasset --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ github.ref_name }}" -a $assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
      # - name: Push packages to nuget
      #   run: dotnet nuget push nugets\*.nupkg
