@@ -1,4 +1,4 @@
-name: Publish
+name: Release with GitReleaseManager
 on:
   workflow_dispatch:
 jobs:
