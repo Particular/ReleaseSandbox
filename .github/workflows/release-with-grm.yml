@@ -1,8 +1,12 @@
 name: Release with GitReleaseManager
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-*'
 jobs:
-  publish:
+  release to staging:
     runs-on: ubuntu-22.04
     environment: staging
     defaults:
@@ -24,6 +28,15 @@ jobs:
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: |
           dotnet tool install --global GitReleaseManager.Tool
+          New-Item -ItemType Directory -Path .templates/default -Force | Out-Null
+          @'
+          {{
+              if issue.is_pull_request
+          }}- [__#{{ issue.public_number }}__]({{ issue.html_url }}) {{ issue.title }}
+          {{  else
+          }}- [__#{{ issue.public_number }}__]({{ issue.html_url }}) {{ issue.title }}
+          {{  end -}}
+          '@ > .templates/default/issue-note.sbn
           @'
           templates-dir: .templates
           create:
@@ -55,8 +68,10 @@ jobs:
       #     name: nugets
       #     path: nugets/*
       #     retention-days: 1
-      # - name: Create release notes draft
-      #   run: 
+      - name: Create release notes draft
+        run: dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ github.ref_name }}" -c "${{ github.sha }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Publish artifacts to the release
       #   run: gh release upload ${{github.event.release.tag_name}} nugets/*
       #   env:
