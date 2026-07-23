@@ -24,20 +24,22 @@ jobs:
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: |
           dotnet tool install --global GitReleaseManager.Tool
-          echo "templates-dir: .templates
-create:
-  include-footer: true
-  footer-heading: Where to get it
-  footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
-issue-labels-include:
-  - \"Bug\"
-  - \"Feature\"
-  - \"Improvement\"
-  - \"Dependency CVE\"
-issue-labels-exclude:
-  - \"Refactoring\"" > GitReleaseManager.yaml
-          echo GitReleaseManager.yaml contents
-          cat GitReleaseManager.yaml
+          @'
+          templates-dir: .templates
+          create:
+            include-footer: true
+            footer-heading: Where to get it
+            footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
+          issue-labels-include:
+            - "Bug"
+            - "Feature"
+            - "Improvement"
+            - "Dependency CVE"
+          issue-labels-exclude:
+            - "Refactoring"
+          '@ > GitReleaseManager.yaml
+          Write-Output "GitReleaseManager.yaml contents"
+          Get-Content GitReleaseManager.yaml
       - name: Build
         run: dotnet build src --configuration Release
       #        - name: Sign NuGet packages
