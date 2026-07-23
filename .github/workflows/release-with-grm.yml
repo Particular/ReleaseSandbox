@@ -53,8 +53,8 @@ jobs:
           '@ > GitReleaseManager.yaml
           Write-Output "`nGitReleaseManager.yaml contents:"
           Get-Content GitReleaseManager.yaml
-          Write-Output "`n`nGitReleaseManager issue_note.sbn template:"
-          Get-Content ./.templates/default/issue-note.sbn
+          Write-Output "`n`nGitReleaseManager issue-note.sbn template:"
+          Get-Content .templates/default/issue-note.sbn
       - name: Build
         run: dotnet build src --configuration Release
       #        - name: Sign NuGet packages
@@ -71,12 +71,15 @@ jobs:
           path: nugets/*
           retention-days: 1
       - name: Create release notes draft
-        run: dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ github.ref_name }}" -c "${{ github.sha }}"
+        run: |
+          Write-Output "Creating release notes draft for ${{ github.event.repository.name }} ${{ github.ref_name }} at commit ${{ github.sha }}"
+          dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ github.ref_name }}" -c "${{ github.sha }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish artifacts to the release
         run: |
           $assets = (Get-ChildItem -Path nugets/ -File).FullName -join ","
+          Write-Output "Uploading assets: $assets"
           dotnet-gitreleasemanager addasset --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ github.ref_name }}" -a $assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
