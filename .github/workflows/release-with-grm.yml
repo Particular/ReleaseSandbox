@@ -76,7 +76,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish artifacts to the release
         run: |
-          $assets = (Get-Children -Path nugets/ -File).FullName -join ","
+          $assets = (Get-ChildItem -Path nugets/ -File).FullName -join ","
           dotnet-gitreleasemanager addasset --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ github.ref_name }}" -a $assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
