@@ -54,7 +54,7 @@ jobs:
           Write-Output "`nGitReleaseManager.yaml contents:"
           Get-Content GitReleaseManager.yaml
           Write-Output "`n`nGitReleaseManager issue_note.sbn template:"
-          Get-Content .templates/default/issue_note.sbn
+          Get-Content ./.templates/default/issue-note.sbn
       - name: Build
         run: dotnet build src --configuration Release
       #        - name: Sign NuGet packages
