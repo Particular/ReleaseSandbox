@@ -1,0 +1,73 @@
+name: Stage Release Notes
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag / milestone / release name to stage (e.g. 1.2.3)'
+        required: true
+        type: string
+  repository_dispatch:
+    types: [deploy-staging]
+jobs:
+  release-staging:
+    runs-on: ubuntu-22.04
+    environment: staging
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+          # source-url: ${{ vars.FEED_URL}}
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
+      - name: Resolve version
+        id: version
+        # Accepts the version from either trigger: workflow_dispatch's input
+        # or repository_dispatch's client_payload (e.g. sent by the Build
+        # workflow once the draft + assets exist).
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if (-not $version) { $version = "${{ github.event.client_payload.version }}" }
+          if (-not $version) { throw "No version supplied via workflow_dispatch input or repository_dispatch client_payload." }
+          Write-Output "Version: $version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+      - name: Setup GitReleaseManager
+        # https://github.com/GitTools/GitReleaseManager#net-global-tool
+        run: |
+          dotnet tool install --global GitReleaseManager.Tool
+          New-Item -ItemType Directory -Path .templates/default -Force | Out-Null
+          @'
+          {{
+              if issue.is_pull_request
+          }}- [__#{{ issue.public_number }}__]({{ issue.html_url }}) {{ issue.title }}
+          {{  else
+          }}- [__#{{ issue.public_number }}__]({{ issue.html_url }}) {{ issue.title }}
+          {{  end -}}
+          '@ > .templates/default/issue-note.sbn
+          @'
+          templates-dir: .templates
+          create:
+            include-footer: true
+            footer-heading: Where to get it
+            footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
+          issue-labels-include:
+            - "Bug"
+            - "Feature"
+            - "Improvement"
+            - "Dependency CVE"
+          issue-labels-exclude:
+            - "Refactoring"
+          '@ > GitReleaseManager.yaml
+          Write-Output "`nGitReleaseManager.yaml contents:"
+          Get-Content GitReleaseManager.yaml
+          Write-Output "`n`nGitReleaseManager issue-note.sbn template:"
+          Get-Content .templates/default/issue-note.sbn
+      - name: Update draft release notes from milestone
+        run: |
+          Write-Output "Updating draft release body for ${{ github.event.repository.name }} ${{ steps.version.outputs.version }} from milestone '${{ steps.version.outputs.version }}'"
+          dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ steps.version.outputs.version }}" -n "${{ steps.version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
