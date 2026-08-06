@@ -56,12 +56,11 @@ jobs:
           foreach ($asset in $release.assets) {
               $outPath = Join-Path 'nugets' $asset.name
               Write-Output "Downloading $($asset.name)..."
-              Invoke-WebRequest -Uri $asset.url -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN"; Accept = 'application/octet-stream' } -OutFile $outPath
+              Invoke-WebRequest -Uri $asset.url -Headers @{ Authorization = "Bearer $env:GH_TOKEN"; Accept = 'application/octet-stream' } -OutFile $outPath
           }
           Get-ChildItem nugets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish release
         run: |
           Write-Output "Publishing release ${{ steps.version.outputs.version }} for ${{ github.event.repository.name }}"
