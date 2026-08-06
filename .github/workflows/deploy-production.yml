@@ -36,7 +36,7 @@ jobs:
         run: dotnet tool install --global GitReleaseManager.Tool
       - name: Download assets from draft release
         # Draft releases can't be pulled by tag so we have to find it 
-        # by listing recent releases
+        # by listing recent releases. 10 most recent should be adequate
         run: |
           $owner = "${{ github.repository_owner }}"
           $repo = "${{ github.event.repository.name }}"
@@ -44,8 +44,6 @@ jobs:
 
           New-Item -ItemType Directory -Path nugets -Force | Out-Null
 
-          # Releases are returned newest-first, so the last 10 is plenty to
-          # find one just created by the Build/Staging stages.
           $releases = gh api "repos/$owner/$repo/releases?per_page=10" | ConvertFrom-Json
           $release = $releases | Where-Object { $_.tag_name -eq $version -or $_.name -eq $version } | Select-Object -First 1
           if (-not $release) {
