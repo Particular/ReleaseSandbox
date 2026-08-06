@@ -1,0 +1,78 @@
+name: Deploy Production
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag / release name to publish (e.g. 1.2.3)'
+        required: true
+        type: string
+  repository_dispatch:
+    types: [deploy-production]
+jobs:
+  release-production:
+    runs-on: ubuntu-22.04
+    environment: production
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Resolve version
+        id: version
+        # Accepts the version from either trigger: workflow_dispatch's input
+        # or repository_dispatch's client_payload (e.g. sent by the Staging
+        # workflow once the release notes have been filled in).
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if (-not $version) { $version = "${{ github.event.client_payload.version }}" }
+          if (-not $version) { throw "No version supplied via workflow_dispatch input or repository_dispatch client_payload." }
+          Write-Output "Version: $version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+      - name: Setup GitReleaseManager
+        # https://github.com/GitTools/GitReleaseManager#net-global-tool
+        run: dotnet tool install --global GitReleaseManager.Tool
+      - name: Download assets from draft release
+        # Draft releases can't be pulled by tag so we have to find it 
+        # by listing recent releases
+        run: |
+          $owner = "${{ github.repository_owner }}"
+          $repo = "${{ github.event.repository.name }}"
+          $version = "${{ steps.version.outputs.version }}"
+
+          New-Item -ItemType Directory -Path nugets -Force | Out-Null
+
+          # Releases are returned newest-first, so the last 10 is plenty to
+          # find one just created by the Build/Staging stages.
+          $releases = gh api "repos/$owner/$repo/releases?per_page=10" | ConvertFrom-Json
+          $release = $releases | Where-Object { $_.tag_name -eq $version -or $_.name -eq $version } | Select-Object -First 1
+          if (-not $release) {
+              throw "No release (including drafts) found matching '$version'."
+          }
+          if ($release.assets.Count -eq 0) {
+              throw "Release '$version' has no assets attached."
+          }
+
+          foreach ($asset in $release.assets) {
+              $outPath = Join-Path 'nugets' $asset.name
+              Write-Output "Downloading $($asset.name)..."
+              Invoke-WebRequest -Uri $asset.url -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN"; Accept = 'application/octet-stream' } -OutFile $outPath
+          }
+          Get-ChildItem nugets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish release
+        run: |
+          Write-Output "Publishing release ${{ steps.version.outputs.version }} for ${{ github.event.repository.name }}"
+          dotnet-gitreleasemanager publish --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ steps.version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push NuGet packages to staging feed
+        # Placeholder -- see https://learn.microsoft.com/en-us/nuget/nuget-org/publish-a-package
+        run: |
+          Write-Output "TODO: push packages to https://int.nugettest.org/"
+          Get-ChildItem nugets
+          # dotnet nuget push nugets\*.nupkg --source https://int.nugettest.org/v3/index.json --api-key $env:NUGET_API_KEY
