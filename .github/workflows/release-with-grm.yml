@@ -1,4 +1,4 @@
-name: Release with GitReleaseManager
+name: Release - build and store assets
 on:
   workflow_dispatch:
   push:
