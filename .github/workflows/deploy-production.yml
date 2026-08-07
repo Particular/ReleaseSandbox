@@ -12,6 +12,8 @@ jobs:
   release-production:
     runs-on: ubuntu-22.04
     environment: production
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     defaults:
       run:
         shell: pwsh
@@ -73,3 +75,18 @@ jobs:
           Write-Output "TODO: push packages to https://int.nugettest.org/"
           Get-ChildItem nugets
           # dotnet nuget push nugets\*.nupkg --source https://int.nugettest.org/v3/index.json --api-key $env:NUGET_API_KEY
+  virus-scan:
+    needs: release-production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Scan release for viruses
+        uses: Particular/virus-scan-action@main
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          tag: ${{ needs.release-production.outputs.version }}
+          github-access-token: ${{ secrets.GITHUB_TOKEN }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ vars.VIRUS_REPORTING_SLACK_CHANNEL }}
