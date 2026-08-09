@@ -16,6 +16,8 @@ jobs:
       run:
         shell: pwsh
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6.0.0
         with:
@@ -38,36 +40,13 @@ jobs:
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: |
           dotnet tool install --global GitReleaseManager.Tool
-          New-Item -ItemType Directory -Path .templates/default -Force | Out-Null
-          @'
-          {{
-              if issue.is_pull_request
-          }}- [__#{{ issue.public_number }}__]({{ issue.html_url }}) {{ issue.title }}
-          {{  else
-          }}- [__#{{ issue.public_number }}__]({{ issue.html_url }}) {{ issue.title }}
-          {{  end -}}
-          '@ > .templates/default/issue-note.sbn
-          @'
-          templates-dir: .templates
-          create:
-            include-footer: true
-            footer-heading: Where to get it
-            footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
-          issue-labels-include:
-            - "Bug"
-            - "Feature"
-            - "Improvement"
-            - "Dependency CVE"
-          issue-labels-exclude:
-            - "Refactoring"
-          '@ > GitReleaseManager.yaml
           Write-Output "`nGitReleaseManager.yaml contents:"
-          Get-Content GitReleaseManager.yaml
+          Get-Content .release/GitReleaseManager.yaml
           Write-Output "`n`nGitReleaseManager issue-note.sbn template:"
-          Get-Content .templates/default/issue-note.sbn
+          Get-Content .release/.templates/default/issue-note.sbn
       - name: Update draft release notes from milestone
         run: |
           Write-Output "Updating draft release body for ${{ github.event.repository.name }} ${{ steps.version.outputs.version }} from milestone '${{ steps.version.outputs.version }}'"
-          dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ steps.version.outputs.version }}" -n "${{ steps.version.outputs.version }}"
+          dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -m "${{ steps.version.outputs.version }}" -n "${{ steps.version.outputs.version }}" -d .release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,12 @@
+templates-dir: .templates
+create:
+  include-footer: true
+  footer-heading: Where to get it
+  footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
+issue-labels-include:
+  - "Bug"
+  - "Feature"
+  - "Improvement"
+  - "Dependency CVE"
+issue-labels-exclude:
+  - "Refactoring"
