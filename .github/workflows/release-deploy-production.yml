@@ -57,29 +57,8 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Download assets from release
-        # Draft releases can't be pulled by tag so we have to find it
-        # by listing recent releases. 10 most recent should be adequate
         run: |
-          $owner = "${{ github.repository_owner }}"
-          $repo = "${{ github.event.repository.name }}"
-          $version = "${{ needs.release-production.outputs.version }}"
-
-          New-Item -ItemType Directory -Path nugets -Force | Out-Null
-
-          $releases = gh api "repos/$owner/$repo/releases?per_page=10" | ConvertFrom-Json
-          $release = $releases | Where-Object { $_.tag_name -eq $version -or $_.name -eq $version } | Select-Object -First 1
-          if (-not $release) {
-              throw "No release (including drafts) found matching '$version'."
-          }
-          if ($release.assets.Count -eq 0) {
-              throw "Release '$version' has no assets attached."
-          }
-
-          foreach ($asset in $release.assets) {
-              $outPath = Join-Path 'nugets' $asset.name
-              Write-Output "Downloading $($asset.name)..."
-              Invoke-WebRequest -Uri $asset.url -Headers @{ Authorization = "Bearer $env:GH_TOKEN"; Accept = 'application/octet-stream' } -OutFile $outPath
-          }
+          gh release download "${{ needs.release-production.outputs.version }}" --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets
           Get-ChildItem nugets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +70,7 @@ jobs:
       - name: Push NuGet packages to production feed
         run: |
           Get-ChildItem nugets
-          dotnet nuget push nugets\*.nupkg --source https://int.nugettest.org/v3/index.json --api-key ${{steps.login.outputs.NUGET_API_KEY}}
+          dotnet nuget push nugets/*.nupkg --source https://int.nugettest.org/v3/index.json --api-key ${{steps.login.outputs.NUGET_API_KEY}}
   virus-scan:
     needs: release-production
     runs-on: ubuntu-latest
