@@ -65,6 +65,7 @@ jobs:
         id: login
         with:
           user: ${{ secrets.TEST_NUGET_USER }}
+          token-service-url: https://int.nugettest.org/api/v2/token
       - name: Push NuGet packages to production feed
         run: |
           Get-ChildItem nugets
