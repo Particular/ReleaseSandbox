@@ -1,4 +1,4 @@
-name: Stage Release Notes
+name: Deploy Staging
 on:
   workflow_dispatch:
     inputs:
@@ -22,9 +22,6 @@ jobs:
         uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: 10.0.x
-          # source-url: ${{ vars.FEED_URL}}
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
       - name: Resolve version
         id: version
         # Accepts the version from either trigger: workflow_dispatch's input
