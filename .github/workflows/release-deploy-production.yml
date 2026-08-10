@@ -70,7 +70,7 @@ jobs:
       - name: Push NuGet packages to production feed
         run: |
           Get-ChildItem nugets
-          dotnet nuget push nugets/*.nupkg --source https://int.nugettest.org/v3/index.json --api-key ${{steps.login.outputs.NUGET_API_KEY}}
+          dotnet nuget push nugets/*.nupkg --source https://int.nugettest.org/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
   virus-scan:
     needs: release-production
     runs-on: ubuntu-latest
