@@ -11,7 +11,6 @@ on:
 jobs:
   release-staging:
     runs-on: ubuntu-22.04
-    environment: staging
     defaults:
       run:
         shell: pwsh
