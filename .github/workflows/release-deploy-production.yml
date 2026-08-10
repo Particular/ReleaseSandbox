@@ -94,7 +94,7 @@ jobs:
       contents: write
     steps:
       - name: Scan release for viruses
-        uses: Particular/virus-scan-action@virus-scan-private-repo-fix
+        uses: Particular/virus-scan-action@main
         with:
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
