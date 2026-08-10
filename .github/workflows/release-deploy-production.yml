@@ -36,13 +36,31 @@ jobs:
       - name: Setup GitReleaseManager
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: dotnet tool install --global GitReleaseManager.Tool
-      - name: Download assets from draft release
-        # Draft releases can't be pulled by tag so we have to find it 
+      - name: Publish release
+        run: |
+          Write-Output "Publishing release ${{ steps.version.outputs.version }} for ${{ github.event.repository.name }}"
+          dotnet-gitreleasemanager publish --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ steps.version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  push-nuget-packages:
+    needs: release-production
+    runs-on: ubuntu-22.04
+    environment: production
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Download assets from release
+        # Draft releases can't be pulled by tag so we have to find it
         # by listing recent releases. 10 most recent should be adequate
         run: |
           $owner = "${{ github.repository_owner }}"
           $repo = "${{ github.event.repository.name }}"
-          $version = "${{ steps.version.outputs.version }}"
+          $version = "${{ needs.release-production.outputs.version }}"
 
           New-Item -ItemType Directory -Path nugets -Force | Out-Null
 
@@ -63,13 +81,7 @@ jobs:
           Get-ChildItem nugets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish release
-        run: |
-          Write-Output "Publishing release ${{ steps.version.outputs.version }} for ${{ github.event.repository.name }}"
-          dotnet-gitreleasemanager publish --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ steps.version.outputs.version }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push NuGet packages to staging feed
+      - name: Push NuGet packages to production feed
         # Placeholder -- see https://learn.microsoft.com/en-us/nuget/nuget-org/publish-a-package
         run: |
           Write-Output "TODO: push packages to https://int.nugettest.org/"
