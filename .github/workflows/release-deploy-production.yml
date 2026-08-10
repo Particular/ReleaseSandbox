@@ -43,6 +43,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   push-nuget-packages:
+    permissions:
+      id-token: write
     needs: release-production
     runs-on: ubuntu-22.04
     environment: production
@@ -81,12 +83,15 @@ jobs:
           Get-ChildItem nugets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get NuGet trusted publishing API key
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.TEST_NUGET_USER }}
       - name: Push NuGet packages to production feed
-        # Placeholder -- see https://learn.microsoft.com/en-us/nuget/nuget-org/publish-a-package
         run: |
-          Write-Output "TODO: push packages to https://int.nugettest.org/"
           Get-ChildItem nugets
-          # dotnet nuget push nugets\*.nupkg --source https://int.nugettest.org/v3/index.json --api-key $env:NUGET_API_KEY
+          dotnet nuget push nugets\*.nupkg --source https://int.nugettest.org/v3/index.json --api-key ${{steps.login.outputs.NUGET_API_KEY}}
   virus-scan:
     needs: release-production
     runs-on: ubuntu-latest
