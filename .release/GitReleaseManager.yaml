@@ -3,6 +3,8 @@ create:
   include-footer: true
   footer-heading: Where to get it
   footer-content: You can download this release from [NuGet](https://www.nuget.org/profiles/ParticularSoftware/).
+close:
+  use-issue-comments: true
 issue-labels-include:
   - "Bug"
   - "Feature"
