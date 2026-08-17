@@ -9,7 +9,7 @@
 
     <ItemGroup Label="Public dependencies">
         <PackageReference Include="NServiceBus" Version="8.2.7" />
-        <PackageReference Include="System.Text.Json" Version="8.0.5" />
+        <PackageReference Include="System.Text.Json" Version="9.0.19" />
     </ItemGroup>
 
     <ItemGroup Label="Private dependencies">
