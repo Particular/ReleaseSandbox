@@ -2,7 +2,7 @@
 
 public class Calculator
 {
-    private int _result;
+    int _result;
 
     public int GetTotal()
     {
