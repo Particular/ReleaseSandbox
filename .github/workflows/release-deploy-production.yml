@@ -26,36 +26,6 @@ jobs:
           dotnet-gitreleasemanager publish --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -t "${{ inputs.version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  push-nuget-packages:
-    permissions:
-      id-token: write
-    needs: release-production
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6.0.0
-        with:
-          dotnet-version: 10.0.x
-      - name: Download assets from release
-        run: |
-          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets
-          Get-ChildItem nugets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get NuGet trusted publishing API key
-        uses: NuGet/login@v1
-        id: login
-        with:
-          user: ${{ secrets.TEST_NUGET_USER }}
-          token-service-url: ${{ secrets.NUGET_SOURCE_DOMAIN }}/api/v2/token
-          audience: ${{ secrets.NUGET_SOURCE_DOMAIN }}
-      - name: Push NuGet packages to production feed
-        run: |
-          Get-ChildItem nugets
-          dotnet nuget push nugets/*.nupkg --source ${{ secrets.NUGET_SOURCE_DOMAIN }}/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
   virus-scan:
     needs: release-production
     runs-on: ubuntu-latest
@@ -71,3 +41,67 @@ jobs:
           github-access-token: ${{ secrets.GITHUB_TOKEN }}
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ vars.VIRUS_REPORTING_SLACK_CHANNEL }}
+  push-nuget-packages:
+    permissions:
+      id-token: write
+    needs: virus-scan
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Download assets from release
+        run: |
+          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets
+        env:
+          GH_TOKEN: ${{ vars.GITHUB_TOKEN }}
+      - name: Get NuGet trusted publishing API key
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.TEST_NUGET_USER }}
+          token-service-url: ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/token
+          audience: ${{ vars.NUGET_SOURCE_DOMAIN }}
+      - name: Push NuGet packages to production feed
+        run: |
+          $packages = Get-ChildItem nugets -Filter *.nupkg -Exclude 'TotallyLegit.ServiceControl.Management.*.nupkg'
+          foreach ($package in $packages)
+          {
+            dotnet nuget push $package.FullName --source ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
+          }
+  push-powershell-packages:
+    needs: virus-scan
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Download assets from release
+        run: |
+          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "TotallyLegit.ServiceControl.Management.*.nupkg" --dir powershellModules
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Powershell modules packages to gallery
+        run: |
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+
+          $repo = Get-PSRepository ${{ vars.GALLERY_NAME }} -ErrorAction Ignore
+
+          if ($null -eq $repo)
+          {
+              Register-PSRepository -Name ${{ vars.GALLERY_NAME }} -SourceLocation ${{ vars.GALLERY_SOURCE_LOCATION }} -PublishLocation ${{ vars.GALLERY_PUBLISH_LOCATION }} -InstallationPolicy Trusted
+          }
+          $psModules = Get-ChildItem powershellModules -File
+          foreach ($module in $psModules)
+          {
+            Publish-PSResource -NupkgPath $module.FullName -Repository ${{ vars.GALLERY_NAME }} -ApiKey ${{ secrets.GALLERY_KEY }}
+          }
