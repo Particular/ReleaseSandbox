@@ -50,12 +50,12 @@ jobs:
         id: login
         with:
           user: ${{ secrets.TEST_NUGET_USER }}
-          token-service-url: https://int.nugettest.org/api/v2/token
-          audience: https://int.nugettest.org
+          token-service-url: ${{ secrets.NUGET_SOURCE_DOMAIN }}/api/v2/token
+          audience: ${{ secrets.NUGET_SOURCE_DOMAIN }}
       - name: Push NuGet packages to production feed
         run: |
           Get-ChildItem nugets
-          dotnet nuget push nugets/*.nupkg --source https://int.nugettest.org/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
+          dotnet nuget push nugets/*.nupkg --source ${{ secrets.NUGET_SOURCE_DOMAIN }}/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
   virus-scan:
     needs: release-production
     runs-on: ubuntu-latest
