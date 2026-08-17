@@ -58,7 +58,7 @@ jobs:
         run: |
           gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets
         env:
-          GH_TOKEN: ${{ vars.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get NuGet trusted publishing API key
         uses: NuGet/login@v1
         id: login
