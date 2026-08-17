@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Description>A TotallyLegit package for testing.</Description>
     </PropertyGroup>
 
     <ItemGroup Label="Public dependencies">
-        <PackageReference Include="NServiceBus" Version="7.8.5" />
-        <PackageReference Include="System.Text.Json" Version="8.0.1" />
+        <PackageReference Include="NServiceBus" Version="8.2.7" />
+        <PackageReference Include="System.Text.Json" Version="8.0.5" AutomaticVersionRange="false"/>
     </ItemGroup>
 
     <ItemGroup Label="Private dependencies">
