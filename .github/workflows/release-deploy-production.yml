@@ -94,11 +94,11 @@ jobs:
         run: |
           [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
-          $repo = Get-PSRepository ${{ vars.GALLERY_NAME }} -ErrorAction Ignore
+          $repo = Get-PSResourceRepository -Name ${{ vars.GALLERY_NAME }} -ErrorAction Ignore
 
           if ($null -eq $repo)
           {
-              Register-PSRepository -Name ${{ vars.GALLERY_NAME }} -SourceLocation ${{ vars.GALLERY_SOURCE_LOCATION }} -PublishLocation ${{ vars.GALLERY_PUBLISH_LOCATION }} -InstallationPolicy Trusted
+              Register-PSResourceRepository -Name ${{ vars.GALLERY_NAME }} -Uri ${{ vars.GALLERY_SOURCE_LOCATION }} -Trusted
           }
           $psModules = Get-ChildItem powershellModules -File
           foreach ($module in $psModules)
