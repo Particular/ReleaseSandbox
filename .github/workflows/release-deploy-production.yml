@@ -44,16 +44,16 @@ jobs:
   push-nuget-packages:
     permissions:
       id-token: write
-    needs: virus-scan
+    needs: publish-release-notes
     uses: ./.github/workflows/push-nuget-packages.yml
     with:
       version: ${{ inputs.version }}
     secrets: inherit
   push-docker-images:
-    needs: virus-scan
+    needs: publish-release-notes
     uses: ./.github/workflows/push-docker-images.yml
   push-powershell-packages:
-    needs: virus-scan
+    needs: publish-release-notes
     uses: ./.github/workflows/push-powershell-packages.yml
     with:
       version: ${{ inputs.version }}
