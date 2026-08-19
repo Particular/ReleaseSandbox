@@ -7,7 +7,7 @@ on:
         required: true
         type: string
 jobs:
-  release-production:
+  publish-release-notes:
     runs-on: ubuntu-22.04
     defaults:
       run:
@@ -27,7 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   virus-scan:
-    needs: release-production
+    needs: publish-release-notes
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -45,70 +45,16 @@ jobs:
     permissions:
       id-token: write
     needs: virus-scan
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6.0.0
-        with:
-          dotnet-version: 10.0.x
-      - name: Download assets from release
-        run: |
-          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get NuGet trusted publishing API key
-        uses: NuGet/login@v1
-        id: login
-        with:
-          user: ${{ secrets.TEST_NUGET_USER }}
-          token-service-url: ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/token
-          audience: ${{ vars.NUGET_SOURCE_DOMAIN }}
-      - name: Push NuGet packages to production feed
-        run: |
-          $packages = Get-ChildItem 'nugets/*' -Include *.nupkg -Exclude 'TotallyLegit.ServiceControl.Management.*.nupkg'
-          Write-Output "Pushing $($packages.Count) NuGet package(s) to ${{ vars.NUGET_SOURCE_DOMAIN }}:"
-          $packages | ForEach-Object { Write-Output " - $($_.Name)" }
-          foreach ($package in $packages)
-          {
-            dotnet nuget push $package.FullName --source ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
-          }
+    uses: ./.github/workflows/push-nuget-packages.yml
+    with:
+      version: ${{ inputs.version }}
+    secrets: inherit
   push-docker-images:
     needs: virus-scan
     uses: ./.github/workflows/push-docker-images.yml
   push-powershell-packages:
     needs: virus-scan
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        shell: pwsh
-    steps:
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6.0.0
-        with:
-          dotnet-version: 10.0.x
-      - name: Download assets from release
-        run: |
-          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "TotallyLegit.ServiceControl.Management.*.nupkg" --dir powershellModules
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Powershell modules packages to gallery
-        run: |
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
-          $repo = Get-PSResourceRepository -Name ${{ vars.GALLERY_NAME }} -ErrorAction Ignore
-
-          if ($null -eq $repo)
-          {
-              Register-PSResourceRepository -Name ${{ vars.GALLERY_NAME }} -Uri ${{ vars.GALLERY_SOURCE_LOCATION }} -Trusted
-          }
-          $psModules = Get-ChildItem powershellModules -File
-          Write-Output "Pushing $($psModules.Count) PowerShell module package(s) to ${{ vars.GALLERY_NAME }}:"
-          $psModules | ForEach-Object { Write-Output " - $($_.Name)" }
-          foreach ($module in $psModules)
-          {
-            Publish-PSResource -NupkgPath $module.FullName -Repository ${{ vars.GALLERY_NAME }} -ApiKey ${{ secrets.GALLERY_KEY }}
-          }
+    uses: ./.github/workflows/push-powershell-packages.yml
+    with:
+      version: ${{ inputs.version }}
+    secrets: inherit
