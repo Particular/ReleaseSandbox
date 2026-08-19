@@ -1,0 +1,14 @@
+<Project>
+
+  <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)..\assets\</ArtifactsPath>
+    <EnableDefaultArtifacts>false</EnableDefaultArtifacts>
+    <!-- workaround for https://github.com/microsoft/MSBuildSdks/issues/477 -->
+    <UseArtifactsOutput>false</UseArtifactsOutput>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RuntimeIdentifier Condition="'$(WindowsSelfContained)' == 'true'">win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+</Project>
