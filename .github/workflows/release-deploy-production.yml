@@ -75,6 +75,9 @@ jobs:
           {
             dotnet nuget push $package.FullName --source ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/package --api-key ${{steps.login.outputs.NUGET_API_KEY}}
           }
+  push-docker-images:
+    needs: virus-scan
+    uses: ./.github/workflows/push-docker-images.yml
   push-powershell-packages:
     needs: virus-scan
     runs-on: ubuntu-22.04

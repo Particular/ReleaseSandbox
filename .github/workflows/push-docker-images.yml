@@ -1,0 +1,9 @@
+name: Push Docker Images
+on:
+  workflow_call:
+jobs:
+  push-docker-images:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Placeholder
+        run: echo "Placeholder for pushing Docker images"
