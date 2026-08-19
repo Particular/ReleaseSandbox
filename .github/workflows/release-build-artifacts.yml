@@ -35,6 +35,12 @@ jobs:
          tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
          client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
          certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
+      - name: Update PowerShell module version
+        # SHOULD NOT BE PART OF REAL RELEASES
+        # This is only here to make testing easier since we are packaging the same folder over and over.
+        # It keeps the published module version in sync with the release tag so we don't have to keep deleting the same version from feedz.
+        run: |
+          Update-PSModuleManifest -Path TotallyLegit.ServiceControl.Management/TotallyLegit.ServiceControl.Management.psd1 -ModuleVersion "${{ github.ref_name }}"
       - name: Compress PowerShell Module
         run: |
           New-Item -ItemType Directory -Path powershellModules -Force
