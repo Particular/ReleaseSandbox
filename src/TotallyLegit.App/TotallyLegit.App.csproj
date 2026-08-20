@@ -5,18 +5,23 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <DebugType Condition="'$(Configuration)' == 'Release'">None</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\TotallyLegit\TotallyLegit.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Build.Artifacts" Version="6.1.63" PrivateAssets="All" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Artifact Include="$(OutputPath)" DestinationFolder="$(ArtifactsPath)TotallyLegit.App" />
-    </ItemGroup>
+    <!-- Drop referenced projects' companion doc-comment files so publish output is just the exe -->
+    <Target Name="RemoveDocumentationFilesFromPublishDir" AfterTargets="Publish">
+        <ItemGroup>
+            <_FilesToRemove Include="$(PublishDir)*.xml" />
+        </ItemGroup>
+        <Delete Files="@(_FilesToRemove)" />
+    </Target>
 
 </Project>
