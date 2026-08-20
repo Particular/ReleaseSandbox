@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TotallyLegit\TotallyLegit.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Build.Artifacts" Version="6.1.63" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Artifact Include="$(OutputPath)" DestinationFolder="$(ArtifactsPath)TotallyLegit.App" />
+    </ItemGroup>
+
+</Project>
