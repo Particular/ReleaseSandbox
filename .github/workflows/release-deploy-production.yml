@@ -58,3 +58,9 @@ jobs:
     with:
       version: ${{ inputs.version }}
     secrets: inherit
+  push-release-info-to-aws-s3:
+    needs: publish-release-notes
+    uses: ./.github/workflows/push-release-info-to-aws-s3.yml
+    with:
+      version: ${{ inputs.version }}
+    secrets: inherit
