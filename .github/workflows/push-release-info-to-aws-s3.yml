@@ -52,11 +52,19 @@ jobs:
           # Write JSON to S3
           $bucket = "testing.platformupdate.particular.net"
           $key = "{0}.txt" -f $product.ToLower()
-          Write-S3Object -BucketName $bucket -Content $json -Key $key -ErrorAction Stop -PublicReadOnly
-          $result = Get-S3Object -BucketName $bucket -Key $key
+          $tempFile = New-TemporaryFile
+          Set-Content -Path $tempFile -Value $json -NoNewline
+
+          aws s3 cp $tempFile "s3://$bucket/$key" --content-type application/json --acl public-read
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "Upload to S3 failed"
+              exit 1
+          }
 
           # Double check upload
-          if ($result.Size -ne $json.Length) {
+          $expectedSize = ([System.Text.Encoding]::UTF8.GetByteCount($json))
+          $uploadedSize = aws s3api head-object --bucket $bucket --key $key --query ContentLength --output text
+          if ([int]$uploadedSize -ne $expectedSize) {
               Write-Error "Content verification failed"
               exit 1
           }
