@@ -55,7 +55,7 @@ jobs:
           $tempFile = New-TemporaryFile
           Set-Content -Path $tempFile -Value $json -NoNewline
 
-          aws s3 cp $tempFile "s3://$bucket/$key" --content-type application/json --acl public-read
+          aws s3 cp $tempFile "s3://$bucket/$key" --content-type application/json
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Upload to S3 failed"
               exit 1
