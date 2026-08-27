@@ -1,4 +1,4 @@
-name: Push NuGet Packages
+name: Push NuGet Packages to Staging
 on:
   workflow_call:
     inputs:
