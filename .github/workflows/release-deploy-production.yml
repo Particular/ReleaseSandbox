@@ -7,7 +7,10 @@ on:
         required: true
         type: string
 jobs:
+  check-authorized-user:
+    uses: ./.github/workflows/check-authorized-user.yml
   publish-release-notes:
+    needs: check-authorized-user
     runs-on: ubuntu-22.04
     defaults:
       run:

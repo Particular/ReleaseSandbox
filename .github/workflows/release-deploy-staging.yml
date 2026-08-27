@@ -7,7 +7,10 @@ on:
         required: true
         type: string
 jobs:
+  check-authorized-user:
+    uses: ./.github/workflows/check-authorized-user.yml
   push-nuget-packages-staging:
+    needs: check-authorized-user
     permissions:
       id-token: write
       contents: write
@@ -16,6 +19,7 @@ jobs:
       version: ${{ inputs.version }}
     secrets: inherit
   create-release-notes:
+    needs: check-authorized-user
     runs-on: ubuntu-22.04
     defaults:
       run:
