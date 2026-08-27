@@ -7,7 +7,14 @@ on:
         required: true
         type: string
 jobs:
-  release-staging:
+  push-nuget-packages-staging:
+    permissions:
+      id-token: write
+      contents: write
+    uses: ./.github/workflows/push-nuget-packages-staging.yml
+    with:
+      version: ${{ inputs.version }}
+  create-release-notes:
     runs-on: ubuntu-22.04
     defaults:
       run:
