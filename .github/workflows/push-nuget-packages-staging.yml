@@ -1,0 +1,43 @@
+name: Push NuGet Packages to Staging
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+jobs:
+  push-nuget-packages:
+    permissions:
+      id-token: write
+      contents: write
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Download assets from draft release
+        run: |
+          $name = "${{ inputs.version }}"
+          $releases = gh api "repos/${{ github.repository }}/releases" | ConvertFrom-Json
+          $release = $releases | Where-Object { $_.name -eq $name } | Select-Object -First 1
+          if (-not $release) {
+            throw "Could not find a release named '$name'"
+          }
+          Write-Output "Found draft release id $($release.id) with tag '$($release.tag_name)' for '$name'"
+
+          gh release download $release.tag_name --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push NuGet packages to staging feed
+        run: |
+          $packages = Get-ChildItem 'nugets/*' -Include *.nupkg -Exclude 'TotallyLegit.ServiceControl.Management.*.nupkg'
+          Write-Output "Pushing $($packages.Count) NuGet package(s) to ${{ vars.PARTICULAR_TESTING_FEED_URL }}:"
+          $packages | ForEach-Object { Write-Output " - $($_.Name)" }
+          foreach ($package in $packages)
+          {
+            dotnet nuget push $package.FullName --source ${{ vars.PARTICULAR_TESTING_FEED_URL }} --api-key ${{ secrets.FEEDZIO_PUBLISH_API_KEY }}
+          }
