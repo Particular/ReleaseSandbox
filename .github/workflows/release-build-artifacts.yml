@@ -68,7 +68,7 @@ jobs:
       - name: Create draft release and attach assets
         run: |
           Write-Output "Creating draft release for ${{ github.event.repository.name }} ${{ github.ref_name }} at commit ${{ github.sha }}"
-          "--RELEASE PENDING--" | Set-Content -Path release-body.md -NoNewline
+          "<!-- RELEASE PENDING -->" | Set-Content -Path release-body.md -NoNewline
           $assets = (Get-ChildItem -Path nugets/, powershellModules/, assets/ -File -Recurse).FullName -join ","
           Write-Output "Attaching assets: $assets"
           dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -n "${{ github.ref_name }}" -c "${{ github.sha }}" -i release-body.md -a $assets
