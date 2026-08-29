@@ -71,6 +71,6 @@ jobs:
           $assets = (Get-ChildItem -Path nugets/, powershellModules/, assets/ -File -Recurse).FullName
           Write-Output "Assets to attach: $assets"
           Write-Output "Creating draft release for ${{ github.event.repository.name }} ${{ inputs.version }} at commit ${{ github.sha }}"
-          gh release create ${{ inputs.version }} $assets -d -n "<!--RELEASE PENDING-->"
+          gh release create ${{ inputs.version }} $assets -d -n "<!--RELEASE PENDING-->" -t "${{ inputs.version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
