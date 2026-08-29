@@ -7,7 +7,7 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+-*'
 jobs:
   build-and-store-artifacts:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: pwsh
@@ -19,8 +19,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
-          # source-url: ${{ vars.FEED_URL}}
+          global-json-file: global.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.FEED_TOKEN}}
       - name: Build
@@ -62,16 +61,11 @@ jobs:
           name: assets
           path: assets/*
           retention-days: 1
-      - name: Setup GitReleaseManager
-        # https://github.com/GitTools/GitReleaseManager#net-global-tool
-        run: dotnet tool install --global GitReleaseManager.Tool
       - name: Create draft release and attach assets
         run: |
+          $assets = (Get-ChildItem -Path nugets/, powershellModules/, assets/ -File -Recurse).FullName
+          Write-Output "Assets to attach: $assets"
           Write-Output "Creating draft release for ${{ github.event.repository.name }} ${{ github.ref_name }} at commit ${{ github.sha }}"
-          "<!-- RELEASE PENDING -->" | Set-Content -Path release-body.md -NoNewline
-          $assets = (Get-ChildItem -Path nugets/, powershellModules/, assets/ -File -Recurse).FullName -join ","
-          Write-Output "Attaching assets: $assets"
-          dotnet-gitreleasemanager create --token $env:GITHUB_TOKEN -o "${{ github.repository_owner }}" -r "${{ github.event.repository.name }}" -n "${{ github.ref_name }}" -c "${{ github.sha }}" -i release-body.md -a $assets
+          gh release create ${{ github.ref_name }} $assets -d -n "<!--RELEASE PENDING-->" -t "${{ github.ref_name }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
