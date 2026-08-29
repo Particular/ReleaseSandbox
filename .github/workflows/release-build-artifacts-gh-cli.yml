@@ -68,9 +68,9 @@ jobs:
           retention-days: 1
       - name: Create draft release and attach assets
         run: |
-          $assets = (Get-ChildItem -Path nugets/ -File -Recurse).FullName -join " "
+          $assets = (Get-ChildItem -Path nugets/, powershellModules/, assets/ -File -Recurse).FullName
           Write-Output "Assets to attach: $assets"
           Write-Output "Creating draft release for ${{ github.event.repository.name }} ${{ inputs.version }} at commit ${{ github.sha }}"
-          gh release create ${{ github.ref_name }} $assets -d
+          gh release create ${{ inputs.version }} $assets -d
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
