@@ -15,12 +15,11 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7.0.1
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6.0.0
+        uses: actions/setup-dotnet@v6
         with:
-          global-json-file: global.json
+          dotnet-version: 'latest'
+          dotnet-channel: 'LTS'
       - name: Download assets from draft release
         run: |
           $name = "${{ inputs.version }}"
