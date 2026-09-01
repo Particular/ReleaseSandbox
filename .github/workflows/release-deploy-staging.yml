@@ -20,7 +20,7 @@ jobs:
     secrets: inherit
   create-release-notes:
     needs: check-authorized-user
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: pwsh
@@ -30,7 +30,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
       - name: Setup GitReleaseManager
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: |
