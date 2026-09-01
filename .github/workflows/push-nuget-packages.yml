@@ -18,7 +18,6 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 'latest'
-          dotnet-channel: 'LTS'
       - name: Download assets from release
         run: |
           gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "*.nupkg" --dir nugets

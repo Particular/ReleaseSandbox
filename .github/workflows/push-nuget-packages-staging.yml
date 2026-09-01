@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 'latest'
-          dotnet-channel: 'LTS'
       - name: Download assets from draft release
         run: |
           $name = "${{ inputs.version }}"

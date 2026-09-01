@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 'latest'
-          dotnet-channel: 'LTS'
       - name: Setup GitReleaseManager
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: dotnet tool install --global GitReleaseManager.Tool
