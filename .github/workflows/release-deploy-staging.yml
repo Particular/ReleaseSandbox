@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Tag / milestone / release name to stage (e.g. 1.2.3)'
         required: true
         type: string
 jobs:
