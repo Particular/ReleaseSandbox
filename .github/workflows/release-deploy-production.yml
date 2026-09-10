@@ -36,6 +36,7 @@ jobs:
     uses: ./.github/workflows/push-nuget-packages.yml
     with:
       version: ${{ inputs.version }}
+      exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   push-docker-images:
     needs: publish-release-notes
@@ -45,10 +46,13 @@ jobs:
     uses: ./.github/workflows/push-powershell-packages.yml
     with:
       version: ${{ inputs.version }}
+      package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   push-release-info-to-aws-s3:
     needs: publish-release-notes
     uses: ./.github/workflows/push-release-info-to-aws-s3.yml
     with:
       version: ${{ inputs.version }}
+      product: "TotallyLegit.App"
+      bucket: "testing.platformupdate.particular.net"
     secrets: inherit
