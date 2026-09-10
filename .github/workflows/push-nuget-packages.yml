@@ -5,6 +5,10 @@ on:
       version:
         required: true
         type: string
+      exclude-package-pattern:
+        required: false
+        type: string
+        default: ''
 jobs:
   push-nuget-packages:
     permissions:
@@ -32,7 +36,10 @@ jobs:
           audience: ${{ vars.NUGET_SOURCE_DOMAIN }}
       - name: Push NuGet packages to production feed
         run: |
-          $packages = Get-ChildItem 'nugets/*' -Include *.nupkg -Exclude 'TotallyLegit.ServiceControl.Management.*.nupkg'
+          $getChildItemParams = @{ Path = 'nugets/*'; Include = '*.nupkg' }
+          $excludePattern = "${{ inputs.exclude-package-pattern }}"
+          if ($excludePattern) { $getChildItemParams.Exclude = $excludePattern }
+          $packages = Get-ChildItem @getChildItemParams
           Write-Output "Pushing $($packages.Count) NuGet package(s) to ${{ vars.NUGET_SOURCE_DOMAIN }}:"
           $packages | ForEach-Object { Write-Output " - $($_.Name)" }
           foreach ($package in $packages)

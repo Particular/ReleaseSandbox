@@ -16,6 +16,7 @@ jobs:
     uses: ./.github/workflows/push-nuget-packages-staging.yml
     with:
       version: ${{ inputs.version }}
+      exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   generate-release-notes:
     needs: check-authorized-user

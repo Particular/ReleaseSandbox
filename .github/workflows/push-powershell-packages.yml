@@ -5,6 +5,9 @@ on:
       version:
         required: true
         type: string
+      package-pattern:
+        required: true
+        type: string
 jobs:
   push-powershell-packages:
     runs-on: ubuntu-latest
@@ -14,7 +17,7 @@ jobs:
     steps:
       - name: Download assets from release
         run: |
-          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "TotallyLegit.ServiceControl.Management.*.nupkg" --dir powershellModules
+          gh release download "${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "${{ inputs.package-pattern }}" --dir powershellModules
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
