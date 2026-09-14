@@ -65,7 +65,4 @@ jobs:
         uses: ./.github/actions/create-draft-release-with-assets
         with:
           asset-paths: "nugets/, powershellModules/, assets/"
-          tag-name: ${{ github.ref_name }}
-          repo-name: ${{ github.event.repository.name }}
-          sha: ${{ github.sha }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

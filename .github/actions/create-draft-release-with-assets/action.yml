@@ -4,15 +4,6 @@ inputs:
   asset-paths:
     required: true
     description: Comma-separated paths/globs passed to Get-ChildItem, e.g. "nugets/, powershellModules/, assets/"
-  tag-name:
-    required: true
-    description: Tag name for the release
-  repo-name:
-    required: true
-    description: Repository name
-  sha:
-    required: true
-    description: Commit sha the release is created at
   github-token:
     required: true
     description: Token used by gh CLI to create the release
@@ -25,7 +16,7 @@ runs:
         $paths = '${{ inputs.asset-paths }}' -split ',' | ForEach-Object { $_.Trim() }
         $assets = (Get-ChildItem -Path $paths -File -Recurse).FullName
         Write-Output "Assets to attach: $assets"
-        Write-Output "Creating draft release for ${{ inputs.repo-name }} ${{ inputs.tag-name }} at commit ${{ inputs.sha }}"
-        gh release create ${{ inputs.tag-name }} $assets -d -n "<!-- RELEASE PENDING -->" -t "${{ inputs.tag-name }}"
+        Write-Output "Creating draft release for ${{ github.event.repository.name }} ${{ github.ref_name }} at commit ${{ github.sha }}"
+        gh release create ${{ github.ref_name }} $assets -d -n "<!-- RELEASE PENDING -->" -t "${{ github.ref_name }}"
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
