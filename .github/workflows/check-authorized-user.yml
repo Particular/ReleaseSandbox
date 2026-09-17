@@ -13,7 +13,7 @@ jobs:
           $actor = "${{ github.actor }}"
           $authorizedUsers = "${{ vars.AUTHORIZED_RELEASE_USERS }}" -split ',' | ForEach-Object { $_.Trim() }
           if ($authorizedUsers -notcontains $actor) {
-            Write-Error "User '$actor' is not authorized to run this workflow. Authorized users: $($authorizedUsers -join ', ')"
+            Write-Error "User '$actor' is not authorized to run this workflow."
             exit 1
           }
           Write-Output "User '$actor' is authorized to run this workflow."
