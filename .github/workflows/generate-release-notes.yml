@@ -22,6 +22,7 @@ jobs:
         # https://github.com/GitTools/GitReleaseManager#net-global-tool
         run: |
           dotnet tool install --global GitReleaseManager.Tool
+          # For testing purposes only
           Write-Output "`nGitReleaseManager.yaml contents:"
           Get-Content .release/GitReleaseManager.yaml
           Write-Output "`n`nGitReleaseManager issue-note.sbn template:"
