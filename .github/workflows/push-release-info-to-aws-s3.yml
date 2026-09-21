@@ -45,10 +45,15 @@ jobs:
           }
 
           $release = $obj | Select-Object -Property @{Name="tag";Expression={$_."tag_name"}}, @{Name="release";Expression={$_."html_url"}}, @{Name="published";Expression={$_."published_at"}}, assets
+          if (-not ($release.tag -match '^\d+\.\d+\.\d+$')) {
+              Write-Error "Release $($release.tag) has an invalid tag format, aborting"
+              exit 1
+          }
+          
           $release.assets = @($release.assets | Where-Object name -Like "*.exe" | Select-Object -Property name, size, @{Name="download";Expression={$_."browser_download_url"}})
 
-          if (-not $release.assets -or -not ($release.tag -match '^\d+\.\d+\.\d+$')) {
-              Write-Error "Release $($release.tag) has no exe assets or an invalid tag format, aborting"
+          if (-not $release.assets) {
+              Write-Error "Release $($release.tag) has no exe assets, aborting"
               exit 1
           }
 
