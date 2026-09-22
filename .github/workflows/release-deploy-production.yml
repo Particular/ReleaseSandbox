@@ -30,6 +30,9 @@ jobs:
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ vars.VIRUS_REPORTING_SLACK_CHANNEL }}
   get-nuget-api-key:
+    permissions:
+      id-token: write
+      contents: read
     needs: publish-release-notes
     runs-on: ubuntu-latest
     outputs:
@@ -43,8 +46,6 @@ jobs:
           token-service-url: ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/token
           audience: ${{ vars.NUGET_SOURCE_DOMAIN }}
   push-nuget-packages:
-    permissions:
-      id-token: write
     needs: get-nuget-api-key
     uses: Particular/deployment-workflows/.github/workflows/push-nuget-packages.yml@nuget-trusted-publishing
     with:
