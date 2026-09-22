@@ -7,20 +7,20 @@ on:
         type: string
 jobs:
   check-authorized-user:
-    uses: ./.github/workflows/check-authorized-user.yml
+    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@0.0.1
   push-nuget-packages-staging:
     needs: check-authorized-user
     permissions:
       id-token: write
       contents: write
-    uses: ./.github/workflows/push-nuget-packages-staging.yml
+    uses: Particular/deployment-workflows/.github/workflows/push-nuget-packages-staging.yml@0.0.1
     with:
       version: ${{ inputs.version }}
       exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   generate-release-notes:
     needs: check-authorized-user
-    uses: ./.github/workflows/generate-release-notes.yml
+    uses: Particular/deployment-workflows/.github/workflows/generate-release-notes.yml@0.0.1
     with:
       version: ${{ inputs.version }}
     secrets: inherit
