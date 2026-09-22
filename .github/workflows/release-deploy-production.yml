@@ -29,13 +29,27 @@ jobs:
           github-access-token: ${{ secrets.GITHUB_TOKEN }}
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ vars.VIRUS_REPORTING_SLACK_CHANNEL }}
+  get-nuget-api-key:
+    needs: publish-release-notes
+    runs-on: ubuntu-latest
+    outputs:
+      nuget-api-key: ${{ steps.login.outputs.NUGET_API_KEY }}
+    steps:
+      - name: Get NuGet trusted publishing API key
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.TEST_NUGET_USER }}
+          token-service-url: ${{ vars.NUGET_SOURCE_DOMAIN }}/api/v2/token
+          audience: ${{ vars.NUGET_SOURCE_DOMAIN }}
   push-nuget-packages:
     permissions:
       id-token: write
-    needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-nuget-packages.yml@0.0.1
+    needs: get-nuget-api-key
+    uses: Particular/deployment-workflows/.github/workflows/push-nuget-packages.yml@nuget-trusted-publishing
     with:
       version: ${{ inputs.version }}
+      nuget-api-key: ${{ needs.get-nuget-api-key.outputs.nuget-api-key }}
       exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   push-docker-images:
