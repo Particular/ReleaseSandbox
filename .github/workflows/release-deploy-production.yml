@@ -7,10 +7,10 @@ on:
         type: string
 jobs:
   check-authorized-user:
-    uses: ./.github/workflows/check-authorized-user.yml
+    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@0.0.1
   publish-release-notes:
     needs: check-authorized-user
-    uses: ./.github/workflows/publish-release-notes.yml
+    uses: Particular/deployment-workflows/.github/workflows/publish-release-notes.yml@0.0.1
     with:
       version: ${{ inputs.version }}
     secrets: inherit
@@ -33,24 +33,24 @@ jobs:
     permissions:
       id-token: write
     needs: publish-release-notes
-    uses: ./.github/workflows/push-nuget-packages.yml
+    uses: Particular/deployment-workflows/.github/workflows/push-nuget-packages.yml@0.0.1
     with:
       version: ${{ inputs.version }}
       exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   push-docker-images:
     needs: publish-release-notes
-    uses: ./.github/workflows/push-docker-images.yml
+    uses: Particular/deployment-workflows/.github/workflows/push-docker-images.yml@0.0.1
   push-powershell-packages:
     needs: publish-release-notes
-    uses: ./.github/workflows/push-powershell-packages.yml
+    uses: Particular/deployment-workflows/.github/workflows/push-powershell-packages.yml@0.0.1
     with:
       version: ${{ inputs.version }}
       package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
     secrets: inherit
   push-release-info-to-aws-s3:
     needs: publish-release-notes
-    uses: ./.github/workflows/push-release-info-to-aws-s3.yml
+    uses: Particular/deployment-workflows/.github/workflows/push-release-info-to-aws-s3.yml@0.0.1
     with:
       version: ${{ inputs.version }}
       product: "TotallyLegit.App"
