@@ -62,7 +62,6 @@ jobs:
           path: assets/*
           retention-days: 1
       - name: Create draft release and attach assets
-        uses: ./.github/actions/create-draft-release-with-assets
+        uses: particular/deployment-workflows/.github/actions/create-draft-release-with-assets@create-draft-release-with-notes-action
         with:
           asset-paths: "nugets/, powershellModules/, assets/"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
