@@ -32,12 +32,16 @@ jobs:
   push-nuget-packages:
     permissions:
       id-token: write
+      contents: read
+    runs-on: ubuntu-latest
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-nuget-packages.yml@0.0.1
-    with:
-      version: ${{ inputs.version }}
-      exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
-    secrets: inherit
+    steps:
+        - uses: particular/deployment-workflows/.github/actions/push-nuget-packages@nuget-trusted-publishing-action
+          with:
+            version: ${{ inputs.version }}
+            nuget-user: ${{ secrets.TEST_NUGET_USER }}
+            nuget-source-domain: ${{ vars.NUGET_SOURCE_DOMAIN }}
+            exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
   push-docker-images:
     needs: publish-release-notes
     uses: Particular/deployment-workflows/.github/workflows/push-docker-images.yml@0.0.1
