@@ -41,6 +41,7 @@ jobs:
           uses: particular/deployment-workflows/.github/actions/push-nuget-packages@combine-push-nuget-package-steps
           with:
             version: ${{ inputs.version }}
+            release-state: published
             publish-mode: trusted-publishing
             nuget-user: ${{ secrets.TEST_NUGET_USER }}
             feed-url: ${{ vars.NUGET_PACKAGES_FEED_URL }}
