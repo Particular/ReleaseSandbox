@@ -22,7 +22,7 @@ jobs:
           version: ${{ inputs.version }}
           exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
           publish-mode: api-key
-          feed-url: ${{ vars.PARTICULAR_TESTING_FEED_URL }}
+          feed-url: ${{ vars.NUGET_PACKAGES_FEED_URL }}
           api-key: ${{ secrets.FEEDZIO_PUBLISH_API_KEY }}
   generate-release-notes:
     needs: check-authorized-user

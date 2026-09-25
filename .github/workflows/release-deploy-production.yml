@@ -34,13 +34,16 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
+    environment: production
     needs: publish-release-notes
     steps:
-        - uses: particular/deployment-workflows/.github/actions/push-nuget-packages@nuget-trusted-publishing-action
+        - name: Push NuGet packages
+          uses: particular/deployment-workflows/.github/actions/push-nuget-packages@combine-push-nuget-package-steps
           with:
             version: ${{ inputs.version }}
+            publish-mode: trusted-publishing
             nuget-user: ${{ secrets.TEST_NUGET_USER }}
-            nuget-source-domain: ${{ vars.NUGET_SOURCE_DOMAIN }}
+            feed-url: ${{ vars.NUGET_PACKAGES_FEED_URL }}
             exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
   push-docker-images:
     needs: publish-release-notes
