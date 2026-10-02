@@ -48,7 +48,7 @@ jobs:
             exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
   push-docker-images:
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-docker-images.yml@docker-workflow
+    uses: Particular/deployment-workflows/.github/workflows/push-docker-images.yml@push-docker-image-ci
     with:
       version: ${{ inputs.version }}
       dry-run: true
