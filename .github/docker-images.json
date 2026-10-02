@@ -1,0 +1,7 @@
+[
+  {
+    "name": "totallylegit-app",
+    "readme_filepath": "./Container-README.md",
+    "short_description": "TotallyLegit sandbox application container image."
+  }
+]
