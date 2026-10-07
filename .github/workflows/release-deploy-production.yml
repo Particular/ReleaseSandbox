@@ -43,7 +43,7 @@ jobs:
             version: ${{ inputs.version }}
             release-state: published
             publish-mode: trusted-publishing
-            nuget-user: ${{ secrets.TEST_NUGET_USER }}
+            nuget-user: ${{ secrets.NUGET_USER }}
             feed-url: ${{ vars.NUGET_PACKAGES_FEED_URL }}
             exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
   push-docker-images:
