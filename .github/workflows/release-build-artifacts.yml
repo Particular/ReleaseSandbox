@@ -42,19 +42,19 @@ jobs:
           New-Item -ItemType Directory -Path powershellModules -Force
           Compress-PSResource -Path TotallyLegit.ServiceControl.Management -DestinationPath powershellModules
       - name: Publish NuGet packages to the workflow
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: nugets
           path: nugets/*
           retention-days: 1
       - name: Publish Powershell modules to the workflow
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: powershell
           path: powershellModules/*
           retention-days: 1
       - name: Publish assets
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: assets
           path: assets/*
