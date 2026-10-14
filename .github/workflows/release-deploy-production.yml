@@ -7,10 +7,10 @@ on:
         type: string
 jobs:
   check-authorized-user:
-    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@0.0.1
+    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@main
   publish-release-notes:
     needs: check-authorized-user
-    uses: Particular/deployment-workflows/.github/workflows/publish-release-notes.yml@0.0.1
+    uses: Particular/deployment-workflows/.github/workflows/publish-release-notes.yml@main
     with:
       version: ${{ inputs.version }}
     secrets: inherit
@@ -37,7 +37,7 @@ jobs:
     needs: publish-release-notes
     steps:
         - name: Push NuGet packages
-          uses: particular/deployment-workflows/.github/actions/push-nuget-packages@combine-push-nuget-package-steps
+          uses: particular/deployment-workflows/.github/actions/push-nuget-packages@main
           with:
             version: ${{ inputs.version }}
             release-state: published
@@ -47,20 +47,21 @@ jobs:
             exclude-package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
   push-docker-images:
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-docker-images.yml@push-docker-image-ci
+    uses: Particular/deployment-workflows/.github/workflows/push-docker-images.yml@main
     with:
       version: ${{ inputs.version }}
       dry-run: true
   push-powershell-packages:
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-powershell-packages.yml@0.0.1
+    uses: Particular/deployment-workflows/.github/workflows/push-powershell-packages.yml@support-staging-in-powershell-workflow
     with:
       version: ${{ inputs.version }}
       package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
+      deploy-environment: production
     secrets: inherit
   push-release-info-to-aws-s3:
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-release-info-to-aws-s3.yml@0.0.1
+    uses: Particular/deployment-workflows/.github/workflows/push-release-info-to-aws-s3.yml@main
     with:
       version: ${{ inputs.version }}
       product: "TotallyLegit.App"

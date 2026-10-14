@@ -7,7 +7,7 @@ on:
         type: string
 jobs:
   check-authorized-user:
-    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@0.0.1
+    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@main
   push-nuget-packages-staging:
     needs: check-authorized-user
     runs-on: ubuntu-latest
@@ -16,7 +16,7 @@ jobs:
       contents: write
     steps:
       - name: Push NuGet packages
-        uses: Particular/deployment-workflows/.github/actions/push-nuget-packages@combine-push-nuget-package-steps
+        uses: Particular/deployment-workflows/.github/actions/push-nuget-packages@main
         with:
           version: ${{ inputs.version }}
           release-state: draft
@@ -26,7 +26,7 @@ jobs:
           api-key: ${{ secrets.FEEDZIO_PUBLISH_API_KEY }}
   generate-release-notes:
     needs: check-authorized-user
-    uses: Particular/deployment-workflows/.github/workflows/generate-release-notes.yml@0.0.1
+    uses: Particular/deployment-workflows/.github/workflows/generate-release-notes.yml@main
     with:
       version: ${{ inputs.version }}
     secrets: inherit
