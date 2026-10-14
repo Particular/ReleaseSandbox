@@ -50,6 +50,7 @@ jobs:
     with:
       version: ${{ inputs.version }}
       dry-run: true
+    secrets: inherit
   push-powershell-packages:
     needs: publish-release-notes
     uses: Particular/deployment-workflows/.github/workflows/push-powershell-packages.yml@support-staging-in-powershell-workflow
