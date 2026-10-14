@@ -53,7 +53,7 @@ jobs:
     secrets: inherit
   push-powershell-packages:
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-powershell-packages.yml@support-staging-in-powershell-workflow
+    uses: Particular/deployment-workflows/.github/workflows/push-powershell-packages.yml@main
     with:
       version: ${{ inputs.version }}
       package-pattern: "TotallyLegit.ServiceControl.Management.*.nupkg"
