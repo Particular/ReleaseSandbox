@@ -7,7 +7,7 @@ on:
         type: string
 jobs:
   check-authorized-user:
-    uses: Particular/deployment-workflows/.github/workflows/authorize-user.yml@main
+    uses: Particular/deployment-workflows/.github/workflows/verify-authorized-user.yml@main
   push-nuget-packages-staging:
     needs: check-authorized-user
     runs-on: ubuntu-latest
