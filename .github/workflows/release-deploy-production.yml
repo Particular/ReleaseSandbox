@@ -65,5 +65,5 @@ jobs:
     with:
       version: ${{ inputs.version }}
       product: "TotallyLegit.App"
-      bucket: "testing.platformupdate.particular.net"
+      bucket: "test.platformupdate.particular.net"
     secrets: inherit
