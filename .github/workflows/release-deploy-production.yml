@@ -61,7 +61,7 @@ jobs:
     secrets: inherit
   push-release-info-to-aws-s3:
     needs: publish-release-notes
-    uses: Particular/deployment-workflows/.github/workflows/push-release-info-to-aws-s3.yml@main
+    uses: Particular/deployment-workflows/.github/workflows/push-release-info-to-aws-s3.yml@aws-s3-retain-octopus-behavior
     with:
       version: ${{ inputs.version }}
       product: "TotallyLegit.App"
