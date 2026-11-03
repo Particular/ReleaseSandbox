@@ -1,4 +1,4 @@
-name: Release - build and store artifacts
+name: Build Artifacts
 on:
   workflow_call:
 jobs:
