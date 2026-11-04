@@ -1,12 +1,14 @@
 name: Build Artifacts
 on:
   workflow_call:
+env:
+  DOTNET_NOLOGO: true
+defaults:
+  run:
+    shell: pwsh
 jobs:
   build-artifacts:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: pwsh
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
@@ -23,10 +25,10 @@ jobs:
       - name: Sign NuGet packages
         uses: Particular/sign-nuget-packages-action@v1.0.0
         with:
-         client-id: ${{ secrets.AZURE_KEY_VAULT_CLIENT_ID }}
-         tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
-         client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
-         certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
+          client-id: ${{ secrets.AZURE_KEY_VAULT_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
+          client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
+          certificate-name: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE_NAME }}
       - name: Update PowerShell module version
         # SHOULD NOT BE PART OF REAL RELEASES
         # This is only here to make testing easier since we are packaging the same folder over and over.
@@ -37,7 +39,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path powershellModules -Force
           Compress-PSResource -Path TotallyLegit.ServiceControl.Management -DestinationPath powershellModules
-      - name: Publish NuGet packages to the workflow
+      - name: Upload artifacts
         uses: actions/upload-artifact@v7.0.2
         with:
           name: nugets
@@ -55,7 +57,7 @@ jobs:
           name: assets
           path: assets/*
           retention-days: 1
-      - name: Create draft release and attach assets
+      - name: Attach artifacts to release
         uses: particular/deployment-workflows/.github/actions/create-draft-release-with-assets@1.0.0
         with:
           asset-paths: "nugets/, powershellModules/, assets/"
